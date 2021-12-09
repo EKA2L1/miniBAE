@@ -62,7 +62,7 @@
     #include "X_API.h"
 #endif
 
-#if (((X_PLATFORM == X_MACINTOSH) || (X_PLATFORM == X_IOS)) && (COMPILER_TYPE == GCC_COMPILER))
+#if (((X_PLATFORM == X_MACINTOSH) || (X_PLATFORM == X_IOS) || (X_PLATFORM == X_ANDROID) || (X_PLATFORM == X_LINUX)) && (COMPILER_TYPE == GCC_COMPILER))
     #ifdef __cplusplus
         #pragma pack()
     #endif
@@ -79,7 +79,7 @@
 
     // $$kk: 08.12.98 merge: changed this 
     /* $$kk: pack(4) for solaris x86 */
-    #if ((CPU_TYPE == k80X86) || (CPU_TYPE == kARM))
+    #if ((CPU_TYPE == kx86_64) || (CPU_TYPE == kARM) || (CPU_TYPE == kAarch64))
         #if (X_PLATFORM == X_SOLARIS)
             #pragma pack (4)
         #else

@@ -315,14 +315,13 @@
 #define X_EPOC              15      // Symbian Quartz6.0 CPP port
 #define X_MACINTOSH         16      // MacOSX
 #define X_IOS               17      // iOS
+#define X_ANDROID           18
+#define X_LINUX             19
 
 // types for CPU_TYPE
-#define k68000              0
-#define kRISC               1
-#define k80X86              2
-#define kSPARC              3
-#define kARM                4
-#define kC54x               5       // Texas Instruments C54x family
+#define kx86_64             1
+#define kARM                2
+#define kAarch64            3
 
 // types for COMPILER_TYPE
 #define DEFAULT_COMPILER    0
@@ -377,40 +376,7 @@
     #pragma mark ## X_PLATFORM includes ##
 #endif
 
-
-#if X_PLATFORM == X_MACINTOSH_9
-    #include "BAEBuildOptions_MacOS.h"
-#elif X_PLATFORM == X_ANDROID
-    #include "BAEBuildOptions_Android.h"
-#elif X_PLATFORM == X_IOS
-    #include "BAEBuildOptions_IOS.h"
-#elif X_PLATFORM == X_MACINTOSH
-    #include "BAEBuildOptions_MacOSX.h"
-#elif X_PLATFORM == X_NAVIO
-    #include "BAEBuildOptions_Navio.h"
-#elif X_PLATFORM == X_WEBTV
-    #include "BAEBuildOptions_WebTV.h"
-#elif X_PLATFORM == X_WIN95
-    #include "BAEBuildOptions_WinOS.h"
-#elif X_PLATFORM == X_WIN_HARDWARE
-    #include "BAEBuildOptions_WinXvD.h"
-#elif X_PLATFORM == X_BE
-    #include "BAEBuildOptions_BeOS.h"
-#elif X_PLATFORM == X_SOLARIS
-    #include "BAEBuildOptions_SolarisOS.h"
-#elif X_PLATFORM == X_WEBTV_CE
-    #include "BAEBuildOptions_WebTV_CE.h"
-#elif X_PLATFORM == X_POCKETPC
-    #include "BAEBuildOptions_PocketPC.h"
-#elif X_PLATFORM == X_STRONGARM
-    #include "BAEBuildOptions_StrongARM.h"
-#elif X_PLATFORM == X_DANGER
-    #include "BAEBuildOptions_Danger.h"
-#elif X_PLATFORM == X_ANSI
-    #include "BAEBuildOptions_ANSI.h"
-#elif X_PLATFORM == X_EPOC
-    #include "BAEBuildOptions_EPOC.h"
-#endif
+#include "BAEBuildOptions_Shared.h"
 
 //-----------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------

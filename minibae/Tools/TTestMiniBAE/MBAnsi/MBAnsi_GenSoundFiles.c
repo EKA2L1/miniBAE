@@ -4,7 +4,7 @@
 **
 **	Reads AIFF, WAVE, MP3, Sun AU sound files
 **
-**	© Copyright 1989-2000 Beatnik, Inc, All Rights Reserved.
+**	ï¿½ Copyright 1989-2000 Beatnik, Inc, All Rights Reserved.
 **	Written by Steve Hales
 **
 **	Beatnik products contain certain trade secrets and confidential and
@@ -129,10 +129,7 @@
 
 #define ODD(x)			((long)(x) & 1L)
 
-#if CPU_TYPE == kRISC
-	#pragma options align=mac68k
-#endif
-#if ((CPU_TYPE == k80X86) || (CPU_TYPE == kSPARC))
+#if (CPU_TYPE == kx86_64)
 	#pragma pack (1)
 #endif
 
@@ -357,7 +354,7 @@ typedef struct
 #if CPU_TYPE == kRISC
 	#pragma options align=reset
 #endif
-#if ((CPU_TYPE == k80X86) || (CPU_TYPE == kSPARC))
+#if ((CPU_TYPE == kx86_64))
 	#pragma pack ()
 #endif
 
@@ -366,7 +363,7 @@ typedef struct
 #if CPU_TYPE == kRISC
 	#pragma options align=mac68k
 #endif
-#if CPU_TYPE == k80X86
+#if CPU_TYPE == kx86_64
 	#pragma pack (1)
 #endif
 	
@@ -404,7 +401,7 @@ typedef struct
 #if CPU_TYPE == kRISC
 	#pragma options align=reset
 #endif
-#if CPU_TYPE == k80X86
+#if CPU_TYPE == kx86_64
 	#pragma pack ()
 #endif
 
