@@ -243,7 +243,7 @@
 //
 // the amount of time in microseconds that
 // passes when calling ProcessSampleFrame
-#if 1
+#if 0
     #define BUFFER_SLICE_TIME           11610
 #else
     #define BUFFER_SLICE_TIME           10000
@@ -252,8 +252,8 @@
 // These times are fixed because our LFO's, and midi decode code
 // relies on the constant 11.6 ms decode rate. This allows for content to
 // sound the same. 
-#define FIXED_BUFFER_SLICE_TIME         11610
-#define FIXED_MAX_CHUNK_SIZE            512
+#define FIXED_BUFFER_SLICE_TIME         10000
+#define FIXED_MAX_CHUNK_SIZE            448
 
 #if BUFFER_SLICE_TIME == 5000
     #define MAX_CHUNK_SIZE          224     // max samples to build per slice at 44k
