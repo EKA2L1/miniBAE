@@ -212,7 +212,7 @@
 
 
 static GM_Song * PV_CreateSongFromMidi(XLongResourceID theID,
-                                        XPTR useThisMidiData, long midiSize,
+                                        XPTR useThisMidiData, XDWORD midiSize,
                                         OPErr *pErr)
 {
     XPTR        theMidiData;

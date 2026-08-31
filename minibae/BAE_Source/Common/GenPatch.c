@@ -733,7 +733,7 @@ GM_Instrument * PV_GetInstrument(GM_Mixer *pMixer, GM_Song *pSong,
                                  XLongResourceID theID,
                                  XBankToken bankToken,
                                  void *theExternalX,
-                                 long patchSize,
+                                 XDWORD patchSize,
                                  OPErr *pErr)
 {
     GM_Instrument *         theI;
