@@ -4010,7 +4010,7 @@ BAEResult BAESound_GetInfo(BAESound sound, BAESampleInfo *outInfo)
 {
     GM_Waveform     *pWave;
     OPErr           err;
-    XDWORD          waveSize, waveFrames, startLoop;
+    XDWORD          waveSize, waveFrames, startLoop, endLoop;
     XFIXED          sampledRate;
 
     err = NO_ERR;
@@ -4028,7 +4028,7 @@ BAEResult BAESound_GetInfo(BAESound sound, BAESampleInfo *outInfo)
                     (err = GM_GetWaveformBitDepth(pWave, &outInfo->bitSize)) != NO_ERR ||
                     (err = GM_GetWaveformNumChannels(pWave, &outInfo->channels)) != NO_ERR ||
                     (err = GM_GetWaveformSampleRate(pWave, &sampledRate)) != NO_ERR ||
-                    (err = GM_GetWaveformLoopPoints(pWave, &startLoop, &startLoop)) != NO_ERR ||
+                    (err = GM_GetWaveformLoopPoints(pWave, &startLoop, &endLoop)) != NO_ERR ||
                     (err = GM_GetWaveformBaseMidiPitch(pWave, &outInfo->baseMidiPitch)) != NO_ERR
                 )
                 {
@@ -4044,6 +4044,7 @@ BAEResult BAESound_GetInfo(BAESound sound, BAESampleInfo *outInfo)
                     outInfo->waveFrames = waveFrames;
                     outInfo->sampledRate = sampledRate;
                     outInfo->startLoop = startLoop;
+                    outInfo->endLoop = endLoop;
                 }
             }
             else
