@@ -4010,6 +4010,8 @@ BAEResult BAESound_GetInfo(BAESound sound, BAESampleInfo *outInfo)
 {
     GM_Waveform     *pWave;
     OPErr           err;
+    XDWORD          waveSize, waveFrames, startLoop;
+    XFIXED          sampledRate;
 
     err = NO_ERR;
     if ( (sound) && (sound->mID == OBJECT_ID) )
@@ -4021,18 +4023,27 @@ BAEResult BAESound_GetInfo(BAESound sound, BAESampleInfo *outInfo)
             if (pWave)
             {
                 if (
-                    (err = GM_GetWaveformByteSize(pWave, &outInfo->waveSize)) != NO_ERR ||
-                    (err = GM_GetWaveformNumFrames(pWave, &outInfo->waveFrames)) != NO_ERR ||
+                    (err = GM_GetWaveformByteSize(pWave, &waveSize)) != NO_ERR ||
+                    (err = GM_GetWaveformNumFrames(pWave, &waveFrames)) != NO_ERR ||
                     (err = GM_GetWaveformBitDepth(pWave, &outInfo->bitSize)) != NO_ERR ||
                     (err = GM_GetWaveformNumChannels(pWave, &outInfo->channels)) != NO_ERR ||
-                    (err = GM_GetWaveformSampleRate(pWave, &outInfo->sampledRate)) != NO_ERR ||
-                    (err = GM_GetWaveformLoopPoints(pWave, &outInfo->startLoop, &outInfo->startLoop)) != NO_ERR ||
+                    (err = GM_GetWaveformSampleRate(pWave, &sampledRate)) != NO_ERR ||
+                    (err = GM_GetWaveformLoopPoints(pWave, &startLoop, &startLoop)) != NO_ERR ||
                     (err = GM_GetWaveformBaseMidiPitch(pWave, &outInfo->baseMidiPitch)) != NO_ERR
                 )
                 {
                     // if one of the conditions fails (non-zero error code), it will stop 
                     // evaluating the rest and 'err' will store the error code.
                     // otherwise err = NO_ERR.
+                }
+                else
+                {
+                    // the public fields are wider than the engine's 32 bit
+                    // out-parameters, so copy rather than alias them
+                    outInfo->waveSize = waveSize;
+                    outInfo->waveFrames = waveFrames;
+                    outInfo->sampledRate = sampledRate;
+                    outInfo->startLoop = startLoop;
                 }
             }
             else
@@ -4599,6 +4610,7 @@ BAEResult BAESound_SetSampleLoopPoints(BAESound sound, unsigned long start, unsi
 BAEResult BAESound_GetSampleLoopPoints(BAESound sound, unsigned long *outStart, unsigned long *outEnd)
 {
     OPErr err;
+    XDWORD start, end;
     
     err = NO_ERR;
     if ( (sound) && (sound->mID == OBJECT_ID) )
@@ -4608,7 +4620,14 @@ BAEResult BAESound_GetSampleLoopPoints(BAESound sound, unsigned long *outStart, 
         {
             if (sound->pWave)
             {
-                err = GM_GetWaveformLoopPoints(sound->pWave, outStart, outEnd);
+                // outStart/outEnd are wider than the engine's 32 bit
+                // out-parameters, so copy rather than alias them
+                err = GM_GetWaveformLoopPoints(sound->pWave, &start, &end);
+                if (err == NO_ERR)
+                {
+                    *outStart = start;
+                    *outEnd = end;
+                }
             }
             else
             {
