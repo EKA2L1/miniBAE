@@ -450,8 +450,8 @@ typedef struct
 typedef struct
 {
     struct g72x_state   state;
-    XWORD               buffer;
-    XSWORD              bits;
+    XDWORD              buffer;
+    XSDWORD             bits;
 } X_PACKBY1 SunDecodeState;
 
 // Note these are defined for big-endian architectures 
@@ -849,7 +849,7 @@ static OPErr IFF_PutChunk(X_IFF *pIFF, XDWORD block, XDWORD size, XPTR p)
 #endif
 
 // Unpack input codes and pass them back as bytes. Returns 1 if there is residual input, returns -1 if eof, else returns 0.
-static int PV_UnpackInput(XFILE fileReference, unsigned int *in_buffer, int *in_bits, 
+static int PV_UnpackInput(XFILE fileReference, XDWORD *in_buffer, XSDWORD *in_bits, 
                           XBYTE *code, int bits)
 {
     XBYTE       in_byte;

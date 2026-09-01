@@ -310,7 +310,7 @@ struct GM_AudioStreamFileInfo
 #if USE_HIGHLEVEL_FILE_API != FALSE
     AudioFileType           fileType;
 #endif
-    long                    formatType;             // typed file compression mode
+    XDWORD                  formatType;             // typed file compression mode
 
     XPTR                    pBlockBuffer;           // used for decompression
     XDWORD           blockSize;              // used for decompression
@@ -1360,7 +1360,7 @@ STREAM_REFERENCE GM_AudioStreamFileSetup(void *threadContext,
     STREAM_REFERENCE        reference;
     GM_Waveform             *pWaveform;
     GM_AudioStreamFileInfo  *pStream;
-    long                    format;
+    XDWORD                  format;
     XDWORD           blockSize;
     OPErr                   err;
     void                    *blockPtr;

@@ -355,7 +355,7 @@ extern char mAboutNames[];
 
 
 // Read a file into memory and return an allocated pointer
-static XPTR PV_GetFileAsData(XFILENAME *pFile, long *pSize)
+static XPTR PV_GetFileAsData(XFILENAME *pFile, XDWORD *pSize)
 {
     XPTR    data;
 
@@ -4010,6 +4010,8 @@ BAEResult BAESound_GetInfo(BAESound sound, BAESampleInfo *outInfo)
 {
     GM_Waveform     *pWave;
     OPErr           err;
+    XDWORD          waveSize, waveFrames, startLoop, endLoop;
+    XFIXED          sampledRate;
 
     err = NO_ERR;
     if ( (sound) && (sound->mID == OBJECT_ID) )
@@ -4021,18 +4023,28 @@ BAEResult BAESound_GetInfo(BAESound sound, BAESampleInfo *outInfo)
             if (pWave)
             {
                 if (
-                    (err = GM_GetWaveformByteSize(pWave, &outInfo->waveSize)) != NO_ERR ||
-                    (err = GM_GetWaveformNumFrames(pWave, &outInfo->waveFrames)) != NO_ERR ||
+                    (err = GM_GetWaveformByteSize(pWave, &waveSize)) != NO_ERR ||
+                    (err = GM_GetWaveformNumFrames(pWave, &waveFrames)) != NO_ERR ||
                     (err = GM_GetWaveformBitDepth(pWave, &outInfo->bitSize)) != NO_ERR ||
                     (err = GM_GetWaveformNumChannels(pWave, &outInfo->channels)) != NO_ERR ||
-                    (err = GM_GetWaveformSampleRate(pWave, &outInfo->sampledRate)) != NO_ERR ||
-                    (err = GM_GetWaveformLoopPoints(pWave, &outInfo->startLoop, &outInfo->startLoop)) != NO_ERR ||
+                    (err = GM_GetWaveformSampleRate(pWave, &sampledRate)) != NO_ERR ||
+                    (err = GM_GetWaveformLoopPoints(pWave, &startLoop, &endLoop)) != NO_ERR ||
                     (err = GM_GetWaveformBaseMidiPitch(pWave, &outInfo->baseMidiPitch)) != NO_ERR
                 )
                 {
                     // if one of the conditions fails (non-zero error code), it will stop 
                     // evaluating the rest and 'err' will store the error code.
                     // otherwise err = NO_ERR.
+                }
+                else
+                {
+                    // the public fields are wider than the engine's 32 bit
+                    // out-parameters, so copy rather than alias them
+                    outInfo->waveSize = waveSize;
+                    outInfo->waveFrames = waveFrames;
+                    outInfo->sampledRate = sampledRate;
+                    outInfo->startLoop = startLoop;
+                    outInfo->endLoop = endLoop;
                 }
             }
             else
@@ -4599,6 +4611,7 @@ BAEResult BAESound_SetSampleLoopPoints(BAESound sound, unsigned long start, unsi
 BAEResult BAESound_GetSampleLoopPoints(BAESound sound, unsigned long *outStart, unsigned long *outEnd)
 {
     OPErr err;
+    XDWORD start, end;
     
     err = NO_ERR;
     if ( (sound) && (sound->mID == OBJECT_ID) )
@@ -4608,7 +4621,14 @@ BAEResult BAESound_GetSampleLoopPoints(BAESound sound, unsigned long *outStart, 
         {
             if (sound->pWave)
             {
-                err = GM_GetWaveformLoopPoints(sound->pWave, outStart, outEnd);
+                // outStart/outEnd are wider than the engine's 32 bit
+                // out-parameters, so copy rather than alias them
+                err = GM_GetWaveformLoopPoints(sound->pWave, &start, &end);
+                if (err == NO_ERR)
+                {
+                    *outStart = start;
+                    *outEnd = end;
+                }
             }
             else
             {
@@ -6014,7 +6034,7 @@ BAEResult BAESong_GetTitle(BAESong song, char *cName, int maxSize)
 BAEResult BAESong_LoadGroovoid(BAESong song, char *cName, BAE_BOOL ignoreBadInstruments) // was LoadFromBank
 {
     SongResource        *pXSong;
-    long                size;
+    XDWORD              size;
     OPErr               theErr;
     XShortResourceID    theID;
     GM_Song             *pSong;
@@ -6195,7 +6215,7 @@ BAEResult BAESong_LoadMidiFromFile(BAESong song, BAEPathName filePath, BAE_BOOL 
     XFILENAME           name;
     XPTR                pMidiData;
     SongResource        *pXSong;
-    long                midiSize;
+    XDWORD              midiSize;
     OPErr               theErr;
     XShortResourceID    theID;
     GM_Song             *pSong;
@@ -6291,7 +6311,7 @@ BAEResult BAESong_LoadRmfFromMemory(BAESong song, void *pRMFData, unsigned long 
     GM_Song             *pSong;
     OPErr               theErr;
     XLongResourceID     theID;
-    long                size;
+    XDWORD              size;
 
     theErr = NO_ERR;
     if ( (song) && (song->mID == OBJECT_ID) )
@@ -8354,7 +8374,7 @@ BAE_INSTRUMENT TranslateBankProgramToInstrument(unsigned short bank,
 //
 #if USE_FULL_RMF_SUPPORT == TRUE
 static OPErr PV_GetRmfSongResource(void *pRMFData, unsigned long rmfSize, short index, 
-                        SongResource **ppOutResource, long *pOutResourceSize)
+                        SongResource **ppOutResource, XDWORD *pOutResourceSize)
 {
     XFILE               fileRef;
     XLongResourceID     theID;
@@ -8407,7 +8427,7 @@ BAEResult BAEUtil_GetInfoSizeFromFile(BAEPathName filePath,
     SongInfo        info;
     BAEResult       theErr;
     SongResource    *pSongRes;
-    long            songResSize = 0;
+    XDWORD          songResSize = 0;
     
     theErr = BAE_NO_ERROR;
     info = PV_TranslateInfoType(infoType);
@@ -8458,7 +8478,7 @@ BAEResult BAEUtil_GetRmfSongInfoFromFile(BAEPathName filePath, short songIndex,
     SongInfo        info;
     BAEResult       theErr;
     SongResource    *pSongRes;
-    long            songResSize;
+    XDWORD          songResSize;
     
     theErr = BAE_NO_ERROR;
     targetBuffer[0] = 0;
@@ -8518,7 +8538,7 @@ BAEResult BAEUtil_GetRmfSongInfo(void *pRMFData, unsigned long rmfSize, short so
     SongInfo        info;
     BAEResult       theErr;
     SongResource    *pSongRes;
-    long            songResSize;
+    XDWORD          songResSize;
 
     theErr = BAE_NO_ERROR;
     targetBuffer[0] = 0;
@@ -8564,7 +8584,7 @@ unsigned long BAEUtil_GetInfoSize(void *pRMFData, unsigned long rmfSize, short s
     SongInfo        info;
     unsigned long   size;
     SongResource    *pSongRes;
-    long            songResSize;
+    XDWORD          songResSize;
 
     size = 0;
     info = PV_TranslateInfoType(infoType);
@@ -8592,7 +8612,7 @@ unsigned long BAEUtil_GetInfoSize(void *pRMFData, unsigned long rmfSize, short s
 BAE_BOOL BAEUtil_IsRmfSongEncrypted(void *pRMFData, unsigned long rmfSize, short songIndex)
 {
     SongResource    *pSongRes;
-    long            songResSize;
+    XDWORD          songResSize;
     BAE_BOOL        locked;
     
     pSongRes = NULL;
@@ -8615,7 +8635,7 @@ BAE_BOOL BAEUtil_IsRmfSongEncrypted(void *pRMFData, unsigned long rmfSize, short
 BAE_BOOL BAEUtil_IsRmfSongCompressed(void *pRMFData, unsigned long rmfSize, short songIndex)
 {
     SongResource    *pSongRes;
-    long            songResSize;
+    XDWORD          songResSize;
     BAE_BOOL        compressed;
     
     pSongRes = NULL;
